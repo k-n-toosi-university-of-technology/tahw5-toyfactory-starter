@@ -30,8 +30,7 @@ public class CheckPMDTest {
         System.err.println("$$$GRADER$$$ | { type:\"MSG\" , key:\"TOTAL\" , value:100, priority:1  }  | $$$GRADER$$$");
     
     }
-    @Test
-    public void testCPD() {
+    public static boolean testCPDViolation() {
         CPDConfiguration cpdConfiguration = new CPDConfiguration();
         cpdConfiguration.setMinimumTileSize(50);
         cpdConfiguration.setFailOnViolation(true);
@@ -53,14 +52,10 @@ public class CheckPMDTest {
 
         copyPasteDetector.go();
         Iterator<Match> matches = copyPasteDetector.getMatches();
-        Assert.assertFalse(matches.hasNext());
-
-        System.err.println("$$$GRADER$$$ | { type:\"SCORE\" , amount:10 , reason:\"CPD. You have duplicate code.\" } | $$$GRADER$$$");
+        return matches.hasNext();
     }
 
-    @Test
-    public void testPMD() {
-
+    public static boolean testPMDViolation() {
         File ROOT = new File("src/main/");
         System.err.println("Root is set to \"" + ROOT.getAbsolutePath() + "\".");
 
@@ -71,7 +66,11 @@ public class CheckPMDTest {
         PMDConfiguration pmdConfiguration = new PMDConfiguration();
         pmdConfiguration.setRuleSets("category/java/bestpractices.xml/DefaultLabelNotLastInSwitchStmt,"
                 + "category/java/design.xml/ExcessiveMethodLength,"
-                + "category/java/errorprone.xml/UseEqualsToCompareStrings");
+                + "category/java/errorprone.xml/UseEqualsToCompareStrings," +
+                "category/java/errorprone.xml/CloseResource," +
+                "category/java/errorprone.xml/CompareObjectsWithEquals," +
+                "category/java/bestpractices.xml/MethodReturnsInternalArray," +
+                "category/java/bestpractices.xml/UnusedImports");
 
 
         String collect = files.stream()
@@ -80,11 +79,9 @@ public class CheckPMDTest {
         pmdConfiguration.setInputPaths(collect);
         pmdConfiguration.setReportFormat("text");
         int violations = PMD.doPMD(pmdConfiguration);
-        Assert.assertTrue("PMD VIOLATION", violations == 0);
-        System.err.println("$$$GRADER$$$ | { type:\"SCORE\" , amount:10 , reason:\"PMD.\" } | $$$GRADER$$$");
+        return violations > 0;
     }
 
-    
     private static List<File> listFiles(File folder, String extension) {
         List<File> files = new ArrayList<>();
         if (folder.canRead()) {
@@ -97,5 +94,17 @@ public class CheckPMDTest {
             }
         }
         return files;
+    }
+
+    @Test
+    public void testCPD() {
+        Assert.assertFalse("CPD Violation", testCPDViolation());
+        System.err.println("$$$GRADER$$$ | { type:\"SCORE\" , amount:10 , reason:\"CPD.\" } | $$$GRADER$$$");
+    }
+
+    @Test
+    public void testPMD() {
+        Assert.assertFalse("PMD Violation", testPMDViolation());
+        System.err.println("$$$GRADER$$$ | { type:\"SCORE\" , amount:10 , reason:\"PMD.\" } | $$$GRADER$$$");
     }
 }

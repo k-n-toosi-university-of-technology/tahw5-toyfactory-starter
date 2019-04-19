@@ -34,9 +34,7 @@ public class CheckStyleTest {
     
     
     
-    @Test
-    public void testCheckStyleIndentation() {
-
+    public static boolean testCheckStyleViolation() {
         /*
          * Files
          */
@@ -63,7 +61,7 @@ public class CheckStyleTest {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(CheckStyleTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         Configuration configuration = null;
         try {
             configuration = ConfigurationLoader.loadConfiguration(inputSource,
@@ -96,84 +94,14 @@ public class CheckStyleTest {
         }
         System.out.println("Found " + errors + " check style errors.");
         System.out.println(sos.toString());
-        assertTrue(errors + " check style errors found. " + sos.toString(), errors == 0);
+
 
         /*
          * Clean up
          */
         checker.destroy();
-        System.err.println("$$$GRADER$$$ | { type:\"SCORE\" , amount:10 , reason:\"Indentation.\" } | $$$GRADER$$$");
-    }
+        return errors > 0;
 
-        @Test
-    public void testCheckStyleNaming() {
-
-        /*
-         * Files
-         */
-        File ROOT = new File("src/main/");
-        System.out.println("Root is set to \"" + ROOT.getAbsolutePath() + "\".");
-
-        List<File> files = new ArrayList<>();
-        listFiles(files, ROOT, "java");
-        System.out.println("Found " + files.size() + " Java source files.");
-
-        /*
-         * Listener
-         */
-        ByteArrayOutputStream sos = new ByteArrayOutputStream();
-        AuditListener listener = new DefaultLogger(sos, AutomaticBean.OutputStreamOptions.NONE);
-
-        /*
-         * Configuration
-         */
-        File CONF = new File("src/test/java/ir/ac/kntu/style/naming.xml");
-        InputSource inputSource = null;
-        try {
-            inputSource = new InputSource(new FileInputStream(CONF));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CheckStyleTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        Configuration configuration = null;
-        try {
-            configuration = ConfigurationLoader.loadConfiguration(inputSource,
-                    new PropertiesExpander(System.getProperties()),
-                    ConfigurationLoader.IgnoredModulesOptions.OMIT);
-        } catch (CheckstyleException ex) {
-            Logger.getLogger(CheckStyleTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        /*
-         * Create checker
-         */
-        Checker checker = new Checker();
-        checker.setModuleClassLoader(Checker.class.getClassLoader());
-        try {
-            checker.configure(configuration);
-        } catch (CheckstyleException ex) {
-            Logger.getLogger(CheckStyleTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        checker.addListener(listener);
-
-        /*
-         * Process
-         */
-        int errors = 0;
-        try {
-            errors = checker.process(files);
-        } catch (CheckstyleException ex) {
-            Logger.getLogger(CheckStyleTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println("Found " + errors + " check style errors.");
-        System.out.println(sos.toString());
-        assertTrue(errors + " check style errors found. " + sos.toString(), errors == 0);
-
-        /*
-         * Clean up
-         */
-        checker.destroy();
-        System.err.println("$$$GRADER$$$ | { type:\"SCORE\" , amount:10 , reason:\"Naming.\" } | $$$GRADER$$$" );
     }
 
     private static void listFiles(List<File> files, File folder, String extension) {
@@ -186,5 +114,11 @@ public class CheckStyleTest {
                 files.add(folder);
             }
         }
+    }
+
+    @Test
+    public void testCheckStyle() {
+        assertFalse("Check Style Violation", testCheckStyleViolation());
+        System.err.println("$$$GRADER$$$ | { type:\"SCORE\" , amount:20 , reason:\"Style is correct.\" } | $$$GRADER$$$");
     }
 }

@@ -9,6 +9,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.junit.Assert;
 
+import ir.ac.kntu.style.*;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,9 +21,10 @@ public class ToyFactoryTest {
 
     @BeforeClass
     public static void testStyles() {
-        boolean testPMDInternal = CheckPMDTest.testPMDInternal();
-        boolean testCheckStyleInternal = CheckStyleTest.testCheckStyleInternal();
-        canTest = testCheckStyleInternal && testPMDInternal;
+        boolean testPMDInternal = CheckPMDTest.testPMDViolation();
+        boolean testCPDInternal = CheckPMDTest.testCPDViolation();
+        boolean testCheckStyleInternal = CheckStyleTest.testCheckStyleViloation();
+        canTest = !testCheckStyleInternal && !testPMDInternal && !testCPDInternal;
     }
 
     Toy toy;
