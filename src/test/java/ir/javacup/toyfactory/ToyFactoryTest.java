@@ -23,7 +23,7 @@ public class ToyFactoryTest {
     public static void testStyles() {
         boolean testPMDInternal = CheckPMDTest.testPMDViolation();
         boolean testCPDInternal = CheckPMDTest.testCPDViolation();
-        boolean testCheckStyleInternal = CheckStyleTest.testCheckStyleViloation();
+        boolean testCheckStyleInternal = CheckStyleTest.testCheckStyleViolation();
         canTest = !testCheckStyleInternal && !testPMDInternal && !testCPDInternal;
     }
 
